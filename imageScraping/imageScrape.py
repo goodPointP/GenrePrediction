@@ -8,7 +8,7 @@ def downloadHTML(ImdbID):
   return html
 
 def extractImageLink(html):
-  soup = BS(html #on_duplicate_attribute='ignore')
+  soup = BS(html) #on_duplicate_attribute='ignore')
   imageLink = soup.find('img')['src']
   #OR
   imageLink = soup.img['src']
