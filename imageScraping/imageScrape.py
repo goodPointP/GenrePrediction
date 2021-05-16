@@ -2,6 +2,8 @@ import urllib.request
 import requests
 from bs4 import BeautifulSoup as BS
 import shutil
+import pandas as pd
+from multiprocessing import Pool
 
 def downloadHTML(ImdbID):
   url = 'https://www.imdb.com/title/'+str(ImdbID)+'/'
@@ -41,7 +43,15 @@ def getImages(ImdbIDs):
         saveImage(image, ImdbID)
 
 # test data
-# ImdbID = 'tt0120737'
+# ids = ['tt0084302', 'tt0000003', 'tt0383846', 'tt0167260', 'tt2221420', 'tt3155794']
+# getImages(ids)
 
-ids = ['tt0084302', 'tt0000003', 'tt0383846', 'tt0167260', 'tt2221420', 'tt3155794']
-getImages(ids)
+#%%
+if __name__ == '__main__':
+    data = pd.read_csv("../data/IMDb_movies.csv")
+    df = data.drop(['original_title', "date_published", "language", "votes", "actors", "director", "writer", "production_company", "metascore", "reviews_from_users", "reviews_from_critics"], axis = 1).dropna()
+    IDs = df.imdb_title_id
+    # start getting images
+    # getImages(IDs)
+    with Pool(15) as p:
+        p.map(getImages, IDs)
