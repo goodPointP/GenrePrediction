@@ -1,6 +1,12 @@
 # GenrePrediction
 Cog Sci 2 Project
 
+# TODO:
+- scrape images from IMDB
+- country mapping
+- how to represent description and title (word2vec ...)?
+- genre mapping
+
 # IMDB database features:
 - rating
 - title
@@ -22,9 +28,3 @@ Cog Sci 2 Project
    - b&w or not
    - divide images to separate tiles, anayze each tile's average color and use that as features
    - calculate color histograms (as seen in: https://medium.com/de-bijenkorf-techblog/image-vector-representations-an-overview-of-ways-to-search-visually-similar-images-3f5729e72d07)
-
-# TODO:
-- scrape images from IMDB
-- country mapping
-- how to represent description and title (word2vec ...)?
-- genre mapping
