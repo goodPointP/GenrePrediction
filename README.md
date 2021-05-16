@@ -3,9 +3,10 @@ Cog Sci 2 Project
 
 # TODO:
 - scrape images from IMDB
-- country mapping
-- how to represent description and title (word2vec ...)?
-- genre mapping
+- DONE country mapping
+- DONE how to represent description and title (word2vec ...)?
+- DONE genre mapping
+- DONE numeric representation of features
 
 # IMDB database features:
 - rating
