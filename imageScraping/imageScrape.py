@@ -21,7 +21,7 @@ def downloadImage(link):
 
 def saveImage(image, ImdbID):
   fileName = str(ImdbID) + '.jpg'
-  fullPath = 'images/' + fileName
+  fullPath = 'posters/' + fileName
   try:
     with open(fullPath, "w") as f:
       f.write(image)
