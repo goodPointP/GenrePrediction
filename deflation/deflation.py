@@ -1,6 +1,7 @@
 import pandas as pd
 
 inflationData, inflationData['amount'] = pd.read_csv("inflation_data.csv"), pd.read_csv("inflation_data.csv")['amount']/100
+# data source: https://www.in2013dollars.com/us/inflation/1920
 
 #%%
 data = pd.read_csv("../data/IMDb_movies.csv")
