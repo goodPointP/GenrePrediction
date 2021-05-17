@@ -2,12 +2,12 @@
 Cog Sci 2 Project
 
 # TODO:
+- adjust budgets and incomes for inflation (function is ready, needs to applied)
 - DONE scrape images from IMDB
 - DONE country mapping
 - DONE how to represent description and title (word2vec ...)?
 - DONE genre mapping
 - DONE numeric representation of features
-- adjust budgets and incomes for inflation
 
 # IMDB database features:
 - rating
