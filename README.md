@@ -2,7 +2,13 @@
 Cog Sci 2 Project
 
 # TODO:
-- scrape images from IMDB
+- adjust budgets and incomes for inflation (function is ready, needs to applied)
+- How to feed tf-idf vectors to the model - Can we just plug them in or do we need to convert them to floats somehow?
+- Multiclassification - How do we do it?
+- Feature extraction from posters
+- (Incorporate directors and writer)
+
+- DONE scrape images from IMDB
 - DONE country mapping
 - DONE how to represent description and title (word2vec ...)?
 - DONE genre mapping
