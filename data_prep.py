@@ -4,13 +4,14 @@ from collections import Counter
 import re
 import operator
 import string
+import pickle
 from functools import reduce
 from sklearn.feature_extraction.text import TfidfVectorizer, CountVectorizer, TfidfTransformer
 
 #%% Prefiltered dataset
 
 data = pd.read_csv("data/IMDb_movies.csv")
-df = data.drop(['original_title', "date_published", "language", "votes", "actors", "director", "writer", "production_company", "metascore", "reviews_from_users", "reviews_from_critics"], axis = 1).dropna()
+df = data.drop(['imdb_title_id','original_title', "date_published", "language", "votes", "actors", "director", "writer", "production_company", "metascore", "reviews_from_users", "reviews_from_critics", 'worlwide_gross_income'], axis = 1).dropna()
 
 #%% Transform titles to TD-IDF vectors
 
@@ -25,9 +26,10 @@ t_tfidf.fit(t_count)
 bagofwords = set(reduce(operator.concat, [i.split(' ') for i in df['description']]))
 bow_stripped = [i.translate(str.maketrans('', '', string.punctuation)) for i in bagofwords]
 d_cv = CountVectorizer(analyzer= 'word', stop_words='english')
-d_tfidf = TfidfTransformer(smooth_idf=True,use_idf=True)
+d_tfidf = TfidfTransformer(smooth_idf=True, use_idf=True)
 d_count = d_cv.fit_transform(bow_stripped)
 d_tfidf.fit(d_count)
+
 vec = [d_tfidf.transform(d_cv.transform([df['description'].iloc[i]])) for i in range(len(df['description']))]
 
 #%% Maps genres to numbers determined by their frequency in the corpus
@@ -61,11 +63,9 @@ df['genre'] = genres_mapped
 df['country'] = [countries_numbered.get(i) for i in countries_stripped]
 df['budget'] = [re.sub("[^0-9]", "", i) for i in df['budget']] #remove non-numeric chars
 df['usa_gross_income'] = [i[2:] for i in df['usa_gross_income']] #remove currency chars
-df['worlwide_gross_income'] = [i[2:] for i in df['worlwide_gross_income']] #remove currency chars
 
-#%% 
+#%%
 
-
-
-
-
+feat_matrix = np.array(df)
+with open('feat_matrix.pkl', 'wb') as f:
+      pickle.dump(feat_matrix,f)
