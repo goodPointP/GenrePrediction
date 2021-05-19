@@ -4,6 +4,9 @@ import face_recognition # 1. install https://visualstudio.microsoft.com/thank-yo
 
 # get SIFT features
 def getImageFeaturesSIFT(imagePath):
+    image = cv2.imread(imagePath)
+    sift = cv2.SIFT_create()
+    kp, SIFTfeatures = sift.detectAndCompute(image, None)
     return SIFTfeatures
 
 # get number of people on the poster
@@ -52,4 +55,6 @@ def getImageFeaturesHistogram(imagePath):
 
 # testing
 imagePath = '../imageScraping/posters/tt8290698.jpg'
-a = getImageFeaturesNumberPeople(imagePath)
+# a = getImageFeaturesNumberPeople(imagePath)
+a = getImageFeaturesSIFT(imagePath)
+
