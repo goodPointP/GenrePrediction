@@ -41,20 +41,20 @@ def getImageFeaturesNumberCharacters(imagePath):
     nChars = len(chars)
     return nChars
 
-# is it in color or not?
-def getImageFeaturesColor(imagePath):
-    return isColored
-
 # average color by tiles
 def getImageFeaturesTilesAverageColors(imagePath):
     return tilesAverageColors
 
 # color histogram
 def getImageFeaturesHistogram(imagePath):
-    return histogram
+    img = cv2.imread(imagePath) #mode could also be HSV
+    histogram = cv2.calcHist([img], [0, 1, 2], None, [16, 16, 16], [0, 256, 0, 256, 0, 256])
+    features = cv2.normalize(histogram, histogram).flatten()
+    return features
 
 # testing
 imagePath = '../imageScraping/posters/tt8290698.jpg'
 # a = getImageFeaturesNumberPeople(imagePath)
-a = getImageFeaturesSIFT(imagePath)
+# a = getImageFeaturesSIFT(imagePath)
+a = getImageFeaturesHistogram(imagePath)
 
