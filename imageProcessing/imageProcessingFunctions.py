@@ -8,22 +8,22 @@ def getImageFeaturesSIFT(imagePath):
 
 # get number of people on the poster
 def getImageFeaturesNumberPeople(imagePath):
-    # image = face_recognition.load_image_file(imagePath)
-    # face_locations = face_recognition.face_locations(image)
-    # return len(face_locations)
-    cascPath = 'supplements/haarcascade_frontalface_default.xml'
-    faceCascade = cv2.CascadeClassifier(cascPath)
-    image = cv2.imread(imagePath)
-    gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
-    faces = faceCascade.detectMultiScale(
-        gray,
-        scaleFactor=1.1,
-        minNeighbors=5,
-        minSize=(30, 30),
-        flags = cv2.CASCADE_SCALE_IMAGE
-    )
-    nPeople = len(faces)
-    return nPeople
+    image = face_recognition.load_image_file(imagePath)
+    face_locations = face_recognition.face_locations(image)
+    return len(face_locations)
+    # cascPath = 'supplements/haarcascade_frontalface_default.xml'
+    # faceCascade = cv2.CascadeClassifier(cascPath)
+    # image = cv2.imread(imagePath)
+    # gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
+    # faces = faceCascade.detectMultiScale(
+    #     gray,
+    #     scaleFactor=1.1,
+    #     minNeighbors=5,
+    #     minSize=(30, 30),
+    #     flags = cv2.CASCADE_SCALE_IMAGE
+    # )
+    # nPeople = len(faces)
+    # return nPeople
 
 # get number alphanumeric characters on the poster
 def getImageFeaturesNumberCharacters(imagePath):
@@ -51,5 +51,5 @@ def getImageFeaturesHistogram(imagePath):
     return histogram
 
 # testing
-imagePath = '../imageScraping/posters/tt0031381.jpg'
+imagePath = '../imageScraping/posters/tt8290698.jpg'
 a = getImageFeaturesNumberPeople(imagePath)
