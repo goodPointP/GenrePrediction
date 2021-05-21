@@ -32,6 +32,7 @@ Cog Sci 2 Project
    - visual bag of words with SIFT
    - number of people
    - number of charaters (using OCR)
-   - b&w or not
+   - ~~b&w or not~~
+   - dominant color
    - divide images to separate tiles, anayze each tile's average color and use that as features
    - calculate color histograms (as seen in: https://medium.com/de-bijenkorf-techblog/image-vector-representations-an-overview-of-ways-to-search-visually-similar-images-3f5729e72d07)

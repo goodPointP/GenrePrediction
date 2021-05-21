@@ -1,9 +1,15 @@
 import cv2
-import pytesseract
+import pytesseract # https://digi.bib.uni-mannheim.de/tesseract/tesseract-ocr-w64-setup-v5.0.0-alpha.20210506.exe tesseract.exe needs to be in C:\Program Files\Tesseract-OCR\
 import face_recognition # 1. install https://visualstudio.microsoft.com/thank-you-downloading-visual-studio/?sku=Community&rel=16 2. pip install dlib 3. pip install face_recognition
+from colorthief import ColorThief #pip install colorthief
+from image_slicer import slice # pip install image-slicer
+import numpy as np
 
 # get SIFT features
 def getImageFeaturesSIFT(imagePath):
+    image = cv2.imread(imagePath)
+    sift = cv2.SIFT_create()
+    kp, SIFTfeatures = sift.detectAndCompute(image, None)
     return SIFTfeatures
 
 # get number of people on the poster
@@ -38,18 +44,46 @@ def getImageFeaturesNumberCharacters(imagePath):
     nChars = len(chars)
     return nChars
 
-# is it in color or not?
-def getImageFeaturesColor(imagePath):
-    return isColored
-
 # average color by tiles
-def getImageFeaturesTilesAverageColors(imagePath):
-    return tilesAverageColors
+def getImageFeaturesTilesMostCommonColors(imagePath, numOfPatches = 25):
+    image = cv2.imread(imagePath)
+    slices = slice(imagePath, numOfPatches)
+    
+    mostCommonColors = []
+    for patch in slices:
+        patch.image
+        patchArray = np.array(patch.image)
+        unique, counts = np.unique(patchArray.reshape(-1, 3), axis=0, return_counts=True)
+        R, G, B = unique[np.argmax(counts)]
+        mostCommonColors.append((R, G, B))
+        
+    return mostCommonColors
+
+def getImageFeaturesDominantColors(imagePath, numOfColors = 5):
+    colorThief = ColorThief(imagePath)
+    palette = colorThief.get_palette(color_count=numOfColors)
+    return palette
 
 # color histogram
 def getImageFeaturesHistogram(imagePath):
-    return histogram
+    img = cv2.imread(imagePath) #mode could also be HSV
+    histogram = cv2.calcHist([img], [0, 1, 2], None, [16, 16, 16], [0, 256, 0, 256, 0, 256])
+    features = cv2.normalize(histogram, histogram).flatten()
+    return features
 
 # testing
-imagePath = '../imageScraping/posters/tt8290698.jpg'
-a = getImageFeaturesNumberPeople(imagePath)
+
+highResPath = '../imageScraping/posters/highres/'
+lowResPath = '../imageScraping/posters/lowres/'
+
+imageName = 'tt8290698.jpg'
+imagePathHighRes, imagePathLowRes  = highResPath + imageName, lowResPath + imageName
+# a = getImageFeaturesNumberPeople(imagePath)
+# a = getImageFeaturesSIFT(imagePath)
+# resultHighRes = getImageFeaturesHistogram(imagePathHighRes)
+# resultLowRes = getImageFeaturesHistogram(imagePathLowRes)
+
+# resultHighRes = getImageFeaturesDominantColors(imagePathHighRes, 5)
+# resultLowRes = getImageFeaturesDominantColors(imagePathLowRes, 5)
+a = getImageFeaturesTilesMostCommonColors(imagePathLowRes)
+
