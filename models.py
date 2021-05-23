@@ -7,6 +7,8 @@ from sklearn.model_selection import RepeatedStratifiedKFold, GridSearchCV
 from sklearn.decomposition import PCA
 import numpy as np
 import pickle
+from sklearn.multioutput import ClassifierChain
+from sklearn.linear_model import LogisticRegression
 
 #%%
 with open('feat_matrix.pkl', 'rb') as f:
@@ -23,7 +25,7 @@ for i, label in enumerate(labels):
 
 X_train, X_test, y_train, y_test = split_data(test_matrix, label_matrix)
 
-#%%
+#%% Multi-label-out-of-the-box
 
 rf = RandomForestClassifier()
 
@@ -38,9 +40,8 @@ mlp.fit(X_train, y_train)
 mlp_pred = mlp.predict(X_test)
 mlp_acc = metrics.f1_score(y_test, rf_pred, average = "micro")
 
-#%% FeatureUnion Approach
 
-#%% PCA approach
+#%% PCA
 titles = np.concatenate([i for i in feat_matrix[:,0]])
 desc = np.concatenate([i for i in feat_matrix[:,5]])
 
@@ -50,7 +51,7 @@ desc_reduced = pca.fit_transform(desc)
 
 features = np.hstack((titles_reduced, desc_reduced))
 
-#%% Meta-modelling approach
+#%% Meta-modelling approach - Uses PCA 
 t_X_train, t_X_test, t_y_train, t_y_test = split_data(titles_reduced, label_matrix)
 d_X_train, d_X_test, d_y_train, d_y_test = split_data(desc_reduced, label_matrix)
 
@@ -62,12 +63,17 @@ desc_clf = RandomForestClassifier()
 desc_clf.fit(d_X_train, d_y_train)
 desc_clf_prob = desc_clf.predict_proba(d_X_test)
 
-#%%
+threshold, upper, lower = 0.5, 1, 0
+combined_probs = np.hstack([np.delete((np.add(title_clf_prob[i], desc_clf_prob[i]) / 2), 0,1) for i in range(len(y_test.T))])
+comb_pred = np.where(combined_probs > threshold, upper, lower)
+comb_acc = metrics.f1_score(y_test, comb_pred, average = "micro")
 
-combined_preds = []
-for movie in y_test:
-    pred_comb = np.zeros(len(y_test.T))
-    for i, y in enumerate(pred_comb):
-        pred_comb[i] = (title_clf_prob[i][1] + desc_clf_prob[i][1]) / 2
-    combined_preds.append(pred_comb)
-        
+#%% Classifier chains approach
+
+mul_X_train, mul_X_test, mul_y_train, mul_y_test = split_data(features, label_matrix)
+
+mul_clf = ClassifierChain(LogisticRegression())
+mul_clf.fit(mul_X_train, mul_y_train)
+mul_pred = mul_clf.predict(mul_X_test)
+mul_acc = metrics.f1_score(mul_y_test, mul_pred, average = "micro")
+
