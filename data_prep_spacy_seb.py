@@ -26,27 +26,34 @@ def remove_punc_stop(corpus):
 #%% Prefiltered dataset
 
 data = pd.read_csv("data/IMDb_movies.csv")
-df = data[['imdb_title_id', 'title','genre','language','description']] #Including language here
-df = df.loc[df['language'] == 'English'].drop(['language'], axis=1).dropna() #Only including english language, to make sure titles are english, then dropping the column
+df = data[['imdb_title_id', 'year', 'genre','description']].dropna() #Including language here
+#%%
+keywords = ['Drama','Comedy','Horror','Romance','Comedy, Drama','Drama, Romance','Comedy, Romance', 'Comedy, Drama, Romance', 'Comedy, Horror', 'Drama, Horror'] 
+values = [700, 700, 2200, 415, 500, 1000, 1000, 700, 570, 229]
+list_unshortened_df = [df[df['genre'] == key] for key in keywords]
+list_shortened_df = []
+for dataframe, value in zip(list_unshortened_df, values):
+    list_shortened_df.append(dataframe.sample(frac=1, random_state=420)[:value])
+df_sorted = pd.concat(list_shortened_df)
+
 
 #%% Text stemming
-
-texts = df['description']
+texts = df_sorted['description']
 texts = remove_punc_stop(texts)
 texts_stemmed = [" ".join(stemmer.stemWords(text)) for text in texts]
 
 #%% TF-IDF
- 
+
 d_tfidf = TfidfVectorizer(analyzer='word', max_features=1000)
 d_count = d_tfidf.fit_transform(texts_stemmed)
 
 test = d_count.toarray()
 
 #%%
-labelset = set(" ".join(df['genre']).replace(",", "").split())
+labelset = set(" ".join(df_sorted['genre']).replace(",", "").split())
 train_data = []
 size = 2000
-for text, labels in zip(texts_stemmed[:size], df['genre'][:size]):
+for text, labels in zip(texts_stemmed[:size], df_sorted['genre'][:size]):
     categories = {}
     labeldict = {i: False for i in labelset}
     if len(labels) == 1:
@@ -77,7 +84,7 @@ config = {"threshold": 0.8}
 nlp.add_pipe('textcat_multilabel', config=config)
 textcat = nlp.get_pipe("textcat_multilabel")
 
-labels = set(" ".join(df['genre']).replace(",", "").split())
+labels = set(" ".join(df_sorted['genre']).replace(",", "").split())
 for key in labeldict.keys():
     textcat.add_label(key)
 
