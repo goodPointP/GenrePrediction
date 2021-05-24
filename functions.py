@@ -7,7 +7,8 @@ import string
 import re
 from nltk.corpus import stopwords
 from collections import Counter
-
+from gensim.models import Word2Vec
+import numpy as np
 def remove_punctuation(text):
     return text.translate(str.maketrans('', '', string.punctuation))
 
@@ -32,9 +33,15 @@ def remove_punc_stop(corpus):
     stopwords_dict = set(stop_words)
     texts = []
     for text in corpus:
-        text = str(re.sub("(?<!s)'\B|\B'\s*", "", text.replace('"', "'")).translate(key))
-        texts.append(' '.join([word for word in text.split() if word.lower() not in stopwords_dict]))    
+        text = str(re.sub("(?<!s)'\B|\B'\s*", "", text.lower().replace('"', "'")).translate(key))
+        texts.append(([word for word in text.split() if word.lower() not in stopwords_dict]))   
     return texts
+
+def word2vec_matrix(corpus, model=Word2Vec.load("word2vec.model")):
+    matrix = []
+    for text in corpus:
+        matrix.append(np.sum([model.wv[word] for word in text.split()], axis=0))
+    return np.array(matrix)
 
 def remove_spaces(text):
     return text.replace(' ','')
