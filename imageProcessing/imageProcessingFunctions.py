@@ -47,11 +47,11 @@ def getImageFeaturesNumberCharacters(imagePath):
 # average color by tiles
 def getImageFeaturesTilesMostCommonColors(imagePath, numOfPatches = 25):
     image = cv2.imread(imagePath)
-    slices = slice(imagePath, numOfPatches)
+    slices = slice(imagePath, numOfPatches, save=False)
     
     mostCommonColors = []
     for patch in slices:
-        patch.image
+        # patch.image
         patchArray = np.array(patch.image)
         unique, counts = np.unique(patchArray.reshape(-1, 3), axis=0, return_counts=True)
         R, G, B = unique[np.argmax(counts)]
@@ -73,11 +73,11 @@ def getImageFeaturesHistogram(imagePath):
 
 # testing
 
-highResPath = '../imageScraping/posters/highres/'
-lowResPath = '../imageScraping/posters/lowres/'
+# highResPath = '../imageScraping/posters/highres/'
+# lowResPath = '../imageScraping/posters/lowres/'
 
-imageName = 'tt8290698.jpg'
-imagePathHighRes, imagePathLowRes  = highResPath + imageName, lowResPath + imageName
+# imageName = 'tt8290698.jpg'
+# imagePathHighRes, imagePathLowRes  = highResPath + imageName, lowResPath + imageName
 # a = getImageFeaturesNumberPeople(imagePath)
 # a = getImageFeaturesSIFT(imagePath)
 # resultHighRes = getImageFeaturesHistogram(imagePathHighRes)
@@ -85,5 +85,43 @@ imagePathHighRes, imagePathLowRes  = highResPath + imageName, lowResPath + image
 
 # resultHighRes = getImageFeaturesDominantColors(imagePathHighRes, 5)
 # resultLowRes = getImageFeaturesDominantColors(imagePathLowRes, 5)
-a = getImageFeaturesTilesMostCommonColors(imagePathLowRes)
+# a = getImageFeaturesTilesMostCommonColors(imagePathLowRes)
 
+#%%
+import pickle
+with open('../data/dataset_final.pkl', 'rb') as f:
+    data = pickle.load(f)
+IDs = data.imdb_title_id
+
+#%%
+import timeit
+starttime = timeit.default_timer()
+
+errorList = []
+imageFeatures = []
+for image in IDs:
+    imageName = '../imageScraping/posters/' + image + '.jpg'
+    currentImageFeatures = []
+    try:
+        currentImageFeatures.append(image)
+        # currentImageFeatures.append(getImageFeaturesSIFT(imageName))
+        currentImageFeatures.append(getImageFeaturesNumberPeople(imageName))
+        currentImageFeatures.append(getImageFeaturesNumberCharacters(imageName))
+        currentImageFeatures.append(getImageFeaturesTilesMostCommonColors(imageName, 25))
+        currentImageFeatures.append(getImageFeaturesDominantColors(imageName, 5))
+        currentImageFeatures.append(getImageFeaturesHistogram(imageName))
+    except:
+        errorList.append(image)
+    imageFeatures.append(currentImageFeatures)
+    
+print("It took: ", timeit.default_timer() - starttime, 'seconds')
+
+#%%
+import pickle
+with open('imageFeaturesNoSIFT.pkl', 'wb') as outfile:
+    pickle.dump(imageFeatures, outfile)
+    
+#%%
+import pickle
+with open('data/imageFeaturesNoSIFT.pkl', 'rb') as f:
+    imageFeatures = pickle.load(f)
