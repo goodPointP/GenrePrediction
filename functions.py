@@ -37,7 +37,7 @@ def remove_punc_stop(corpus):
         texts.append(([word for word in text.split() if word.lower() not in stopwords_dict]))   
     return texts
 
-def word2vec_matrix(corpus, model=Word2Vec.load("word2vec.model")):
+def word2vec_matrix(corpus, model=Word2Vec.load("data/word2vec.model")):
     matrix = []
     for text in corpus:
         matrix.append(np.sum([model.wv[word] for word in text.split()], axis=0))
