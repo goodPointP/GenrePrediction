@@ -52,20 +52,28 @@ def getPoster(ImdbID):
     im.save(fullPath)
     
 #%%
-DRIVER_PATH = 'chromedriver.exe'
-driver = webdriver.Chrome(executable_path=DRIVER_PATH)
-ImdbIDs = ['tt0000003', 'tt0084302', 'tt0383846', 'tt0167260', 'tt2221420', 'tt3155794']
-for ImdbID in ImdbIDs:
-    getPoster(ImdbID)
+# DRIVER_PATH = 'chromedriver.exe'
+# driver = webdriver.Chrome(executable_path=DRIVER_PATH)
+# ImdbIDs = ['tt0000003', 'tt0084302', 'tt0383846', 'tt0167260', 'tt2221420', 'tt3155794']
+# for ImdbID in ImdbIDs:
+#     getPoster(ImdbID)
 
 #%%
-data = pd.read_csv("../data/IMDb_movies.csv")
-df = data.drop(['original_title', "date_published", "language", "votes", "actors", "director", "writer", "production_company", "metascore", "reviews_from_users", "reviews_from_critics"], axis = 1).dropna()
-IDs = df.imdb_title_id
+data = pd.read_csv("../data/dataset_final.pkl")
+# IDs = df.imdb_title_id
 
+#%%
+import pickle
+with open('../data/dataset_final.pkl', 'rb') as f:
+    data = pickle.load(f)
+IDs = data.imdb_title_id
 #%%
 DRIVER_PATH = 'chromedriver.exe'
 driver = webdriver.Chrome(executable_path=DRIVER_PATH)
 
-for ImdbID in IDs:
-    getPoster(ImdbID)
+errorList = []
+for ImdbID in IDs[1334:]:
+    try:
+        getPoster(ImdbID)
+    except:
+        errorList.append(ImdbID)
