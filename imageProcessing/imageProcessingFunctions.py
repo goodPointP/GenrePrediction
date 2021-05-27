@@ -71,21 +71,45 @@ def getImageFeaturesHistogram(imagePath):
     features = cv2.normalize(histogram, histogram).flatten()
     return features
 
-# testing
+#%%
+def detect_text(path):
+    """Detects text in the file."""
+    from google.cloud import vision
+    import io
+    client = vision.ImageAnnotatorClient()
 
-# highResPath = '../imageScraping/posters/highres/'
-# lowResPath = '../imageScraping/posters/lowres/'
+    with io.open(path, 'rb') as image_file:
+        content = image_file.read()
 
-# imageName = 'tt8290698.jpg'
-# imagePathHighRes, imagePathLowRes  = highResPath + imageName, lowResPath + imageName
-# a = getImageFeaturesNumberPeople(imagePath)
-# a = getImageFeaturesSIFT(imagePath)
-# resultHighRes = getImageFeaturesHistogram(imagePathHighRes)
-# resultLowRes = getImageFeaturesHistogram(imagePathLowRes)
+    image = vision.Image(content=content)
 
-# resultHighRes = getImageFeaturesDominantColors(imagePathHighRes, 5)
-# resultLowRes = getImageFeaturesDominantColors(imagePathLowRes, 5)
-# a = getImageFeaturesTilesMostCommonColors(imagePathLowRes)
+    response = client.text_detection(image=image)
+    texts = response.text_annotations
+    # print('Texts:')
+
+    for text in texts:
+        rawText = text.description
+        break
+        # print('\n"{}"'.format(text.description))
+
+        # vertices = (['({},{})'.format(vertex.x, vertex.y)
+                    # for vertex in text.bounding_poly.vertices])
+
+        # print('bounds: {}'.format(','.join(vertices)))
+
+    if response.error.message:
+        raise Exception(
+            '{}\nFor more info on error messages, check: '
+            'https://cloud.google.com/apis/design/errors'.format(
+                response.error.message))
+
+    rawText = rawText.replace('\n', '')
+    rawText = rawText.replace(' ', '')
+    
+    # print(rawText)
+
+    return len(rawText)
+
 
 #%%
 import pickle
@@ -100,18 +124,18 @@ starttime = timeit.default_timer()
 errorList = []
 imageFeatures = []
 for image in IDs:
-    imageName = '../imageScraping/posters/' + image + '.jpg'
+    imageName = 'posters/highres/' + image + '.jpg'
     currentImageFeatures = []
     try:
         currentImageFeatures.append(image)
         # currentImageFeatures.append(getImageFeaturesSIFT(imageName))
-        currentImageFeatures.append(getImageFeaturesNumberPeople(imageName))
-        currentImageFeatures.append(getImageFeaturesNumberCharacters(imageName))
-        currentImageFeatures.append(getImageFeaturesTilesMostCommonColors(imageName, 25))
-        currentImageFeatures.append(getImageFeaturesDominantColors(imageName, 5))
-        currentImageFeatures.append(getImageFeaturesHistogram(imageName))
+        # currentImageFeatures.append(getImageFeaturesNumberPeople(imageName))
+        currentImageFeatures.append(detect_text(imageName))
+        # currentImageFeatures.append(getImageFeaturesTilesMostCommonColors(imageName, 25))
+        # currentImageFeatures.append(getImageFeaturesDominantColors(imageName, 5))
+        # currentImageFeatures.append(getImageFeaturesHistogram(imageName))
     except:
-        errorList.append(image)
+        errorList.append(imageName)
     imageFeatures.append(currentImageFeatures)
     
 print("It took: ", timeit.default_timer() - starttime, 'seconds')
@@ -119,9 +143,9 @@ print("It took: ", timeit.default_timer() - starttime, 'seconds')
 #%%
 import pickle
 with open('imageFeaturesNoSIFT.pkl', 'wb') as outfile:
-    pickle.dump(imageFeatures, outfile)
+    pickle.dump(imageFeaturesOriginal, outfile)
     
 #%%
 import pickle
-with open('data/imageFeaturesNoSIFT.pkl', 'rb') as f:
-    imageFeatures = pickle.load(f)
+with open('../data/imageFeaturesNoSIFT.pkl', 'rb') as f:
+    imageFeaturesOriginal = pickle.load(f)
