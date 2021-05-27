@@ -40,7 +40,7 @@ def remove_punc_stop(corpus):
 def word2vec_matrix(corpus, model=Word2Vec.load("data/word2vec.model")):
     matrix = []
     for text in corpus:
-        matrix.append(np.sum([model.wv[word] for word in text.split()], axis=0))
+        matrix.append(np.sum([model.wv.get_vector(word, norm=True) for word in text.split()], axis=0))
     return np.array(matrix)
 
 def remove_spaces(text):
