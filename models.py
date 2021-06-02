@@ -1,4 +1,5 @@
 from functions import *
+from functions import word2vec_matrix
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.neural_network import MLPClassifier
 from sklearn import metrics
@@ -10,8 +11,10 @@ from sklearn.multioutput import ClassifierChain
 from sklearn.linear_model import LogisticRegression
 from sklearn.feature_extraction.text import CountVectorizer, TfidfVectorizer
 import Stemmer
+# import nltk.stem as stemmer
 from sklearn.model_selection import GridSearchCV
-
+from sklearn.preprocessing import StandardScaler
+from sklearn.neighbors import KNeighborsClassifier
 
 #%% Opening data
 with open('data/dataset_final.pkl', 'rb') as f:
@@ -20,35 +23,38 @@ with open('data/dataset_final.pkl', 'rb') as f:
 with open('data/image_matrix.pkl', 'rb') as f:
     image_matrix = pickle.load(f)
     
-#### YOUR CODE HERE "WITH OPEN...."
+with open('data/imageFeaturesOnlySIFT.pkl', 'rb') as f:
+    SIFT_matrix = pickle.load(f)
+    
+with open('data/stemmed_texts.pkl', 'rb') as f:
+    stemmed_texts = pickle.load(f)
 
 #%% Creating X and y
 
 label_matrix = CountVectorizer().fit_transform(feat_matrix['genre']).toarray()
 description_matrix = feat_matrix['description']
 
-#%% Preprocessing
-
-stemmer = Stemmer.Stemmer('english')
-texts = remove_punc_stop(description_matrix)
-texts_stemmed = [' '.join(stemmer.stemWords(text)) for text in texts]
 
 #%% Train-test split for FITTING purposes
 
-X_train_fitter, X_test_fitter, y_train_fitter, y_test_fitter = split_data(texts_stemmed, label_matrix)
-
+X_train_fitter, X_test_fitter, y_train_fitter, y_test_fitter = split_data(stemmed_texts, label_matrix)
+#%%
 tfidf = TfidfVectorizer(analyzer='word', max_features=1000)
 X_train_tfidf_fitter = tfidf.fit_transform(X_train_fitter).toarray()
 
 #%% Creating the combined feature matrix
 
-X_word2vec = word2vec_matrix(texts_stemmed)
+X_word2vec = word2vec_matrix(stemmed_texts)
 X_tfidf = tfidf.transform(texts_stemmed).toarray()
 X_text_combined = np.hstack((X_tfidf, X_word2vec))
 
-#### YOUR CODE HERE (BELOW) ADD NEW MATRIX TO X_IMAGE_TEXT_COMBINED
-X_image_text_combined = np.hstack((X_tfidf, X_word2vec, image_matrix))
+scaler = StandardScaler()
+SIFT_matrix_scaled = scaler.fit_transform(SIFT_matrix)
 
+#### YOUR CODE HERE (BELOW) ADD NEW MATRIX TO X_IMAGE_TEXT_COMBINED
+# X_image_text_combined = np.hstack((X_tfidf, X_word2vec, image_matrix, SIFT_matrix_scaled))
+X_image_text_combined = np.hstack((X_tfidf, X_word2vec, image_matrix, SIFT_matrix_scaled))
+# X_image_text_combined = SIFT_matrix_scaled
 #%% Train-test for PCA
 
 X_train_temp, X_test_temp, y_train, y_test = split_data(X_image_text_combined, label_matrix)
@@ -64,17 +70,20 @@ pca_X_test = pca.transform(X_test_temp)[:,:np.argmax(cumsum > 0.99)]
 #%% Setting final X Train/Test
 X_train = pca_X_train
 X_test = pca_X_test
-#%% Running classifiers, at this point ignoring KNN and RF as they are generally performing worse
-# knn = KNeighborsClassifier(n_neighbors=5)
-# knn.fit(X_train, y_train)
-# knn_pred = knn.predict(X_test)
-# knn_acc = metrics.f1_score(y_test, knn_pred, average='micro')
 
-# rf = RandomForestClassifier()
-# rf.fit(X_train, y_train)
-# rf_pred = rf.predict(X_test)
-# rf_prob = rf.predict_proba(X_test)
-# rf_acc = metrics.f1_score(y_test, rf_pred, average = "micro")
+X_train = X_train_temp
+X_test = X_test_temp
+#%% Running classifiers, at this point ignoring KNN and RF as they are generally performing worse
+knn = KNeighborsClassifier(n_neighbors=5)
+knn.fit(X_train, y_train)
+knn_pred = knn.predict(X_test)
+knn_acc = metrics.f1_score(y_test, knn_pred, average='micro')
+
+rf = RandomForestClassifier()
+rf.fit(X_train, y_train)
+rf_pred = rf.predict(X_test)
+rf_prob = rf.predict_proba(X_test)
+rf_acc = metrics.f1_score(y_test, rf_pred, average = "micro")
 
 mlp = MLPClassifier(activation='relu', alpha=0.0001, learning_rate_init=0.001, hidden_layer_sizes=(200,), solver='sgd', max_iter=1000)
 mlp.fit(X_train, y_train)
@@ -97,6 +106,7 @@ mul_acc = metrics.f1_score(y_test, mul_pred, average = "micro")
 #como_clrs: 49, 53, 50, 49
 #clr_hist: 47, 53, 55, 39
 #text data: #, 62, 67, 63
+#sift-10: #, 44, 45, # 
 #image data: #, 53, 57, 48
 #combined: 64, 71.5, 72, 47
 #%% Hyperparam tuning
