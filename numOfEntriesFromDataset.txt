@@ -1,0 +1,17 @@
+FINALS:
+drama - 700
+comedy - 700
+horror - 2200
+romance - 415
+com/dram - 500
+dram/rom - 1000
+com/rom - 1000
+com/dram/rom - 700
+com/hor - 570
+dram/hor - 229
+
+FINALS ALL IN ALL:
+drama: 3129
+comedy: 3470
+horror: 2999
+romance: 3115
