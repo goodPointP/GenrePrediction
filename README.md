@@ -2,17 +2,17 @@
 Cog Sci 2 Project
 
 # IMDB database features:
-- ~~rating
-- ~~title
-- ~~year
-- ~~duration
-- ~~country
-- ~~director(s) (?)
-- ~~writer(s) (?)
+- ~~rating~~
+- ~~title~~
+- ~~year~~
+- ~~duration~~
+- ~~country~~
+- ~~director(s) (?)~~
+- ~~writer(s) (?)~~
 - IMDB descriptions
-- ~~budget
-- ~~USA income
-- ~~worldwide income
+- ~~budget~~
+- ~~USA income~~
+- ~~worldwide income~~
 
 # Other relevant features:
 - posters:
