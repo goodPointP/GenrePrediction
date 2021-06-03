@@ -14,12 +14,11 @@ Cog Sci 2 Project
 - ~~USA income~~
 - ~~worldwide income~~
 
-# Other relevant features:
-- posters:
-   - visual bag of words with SIFT
-   - number of people / presence
-   - number of charaters (using OCR)
-   - ~~b&w or not~~
-   - dominant color
-   - divide images to separate tiles, anayze each tile's average color and use that as features
-   - color histograms
+# Image features:
+- visual bag of words with SIFT
+- number of people / presence
+- number of charaters (using OCR)
+- ~~b&w or not~~
+- dominant color
+- divide images to separate tiles, anayze each tile's average color and use that as features
+- color histograms
