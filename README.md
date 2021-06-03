@@ -7,7 +7,7 @@ Cog Sci 2 Project
 
 ## Image features
 - visual bag of words with SIFT
-- number of people / presence
+- presence of faces 
 - number of charaters (using OCR)
 - ~~b&w or not~~
 - dominant color
