@@ -1,11 +1,11 @@
 # GenrePrediction
 Cog Sci 2 Project
 
-# IMDB text description features:
+# IMDB text description features
 - TF-IDF
 - Word2Vec
 
-# Image features:
+# Image features
 - visual bag of words with SIFT
 - number of people / presence
 - number of charaters (using OCR)
